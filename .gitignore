@@ -1,0 +1,15 @@
+# Proto source files (generated via grpcurl reflection)
+*.proto
+# But keep the generated Go files
+!*.pb.go
+
+# Binaries
+exporter
+
+# Test coverage
+*.out
+coverage.html
+
+# Temporary files
+/tmp
+settings.local.json
