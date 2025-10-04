@@ -15,7 +15,7 @@ COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 COPY proto/ ./proto/
 
-# Cross-compile for target platform (no QEMU emulation)
+# Cross-compile for target platform (no QEMU emulation needed)
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o exporter ./cmd/exporter
 
 # Runtime stage - scratch for minimal image
