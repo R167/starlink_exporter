@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - optimize-docker-build
 
 env:
   REGISTRY: ghcr.io
