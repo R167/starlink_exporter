@@ -1,33 +1,9 @@
 package client
 
-import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"os/exec"
-)
-
-const (
-	dishAddress = "192.168.100.1:9200"
-	service     = "SpaceX.API.Device.Device/Handle"
-)
-
 // Client interface for Starlink dish communication
 type Client interface {
 	GetStatus() (*StatusResponse, error)
 	GetHistory() (*HistoryResponse, error)
-}
-
-// StarlinkClient interacts with Starlink dish via grpcurl
-type StarlinkClient struct {
-	address string
-}
-
-// NewStarlinkClient creates a new Starlink client
-func NewStarlinkClient() *StarlinkClient {
-	return &StarlinkClient{
-		address: dishAddress,
-	}
 }
 
 // DeviceInfo contains device information
@@ -80,50 +56,4 @@ type HistoryResponse struct {
 	PopPingLatencyMs      []float64 `json:"popPingLatencyMs"`
 	PopPingDropRate       []float64 `json:"popPingDropRate"`
 	PowerIn               []float64 `json:"powerIn"`
-}
-
-// GetStatus retrieves current status from the dish
-func (c *StarlinkClient) GetStatus() (*StatusResponse, error) {
-	cmd := exec.Command("grpcurl", "-plaintext", "-d", `{"get_status":{}}`, c.address, service)
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("grpcurl failed: %v, stderr: %s", err, stderr.String())
-	}
-
-	var response struct {
-		DishGetStatus StatusResponse `json:"dishGetStatus"`
-	}
-
-	if err := json.Unmarshal(stdout.Bytes(), &response); err != nil {
-		return nil, fmt.Errorf("failed to parse status response: %v", err)
-	}
-
-	return &response.DishGetStatus, nil
-}
-
-// GetHistory retrieves historical data from the dish
-func (c *StarlinkClient) GetHistory() (*HistoryResponse, error) {
-	cmd := exec.Command("grpcurl", "-plaintext", "-d", `{"get_history":{}}`, c.address, service)
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("grpcurl failed: %v, stderr: %s", err, stderr.String())
-	}
-
-	var response struct {
-		DishGetHistory HistoryResponse `json:"dishGetHistory"`
-	}
-
-	if err := json.Unmarshal(stdout.Bytes(), &response); err != nil {
-		return nil, fmt.Errorf("failed to parse history response: %v", err)
-	}
-
-	return &response.DishGetHistory, nil
 }

@@ -1,5 +1,8 @@
 # Build stage
-FROM golang:1.25-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS builder
+
+ARG TARGETARCH
+ARG TARGETOS
 
 WORKDIR /build
 
@@ -12,8 +15,8 @@ COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 COPY proto/ ./proto/
 
-# Build static binary
-RUN go build -o exporter ./cmd/exporter
+# Cross-compile for target platform (no QEMU emulation needed)
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build -o exporter ./cmd/exporter
 
 # Runtime stage - scratch for minimal image
 FROM scratch
