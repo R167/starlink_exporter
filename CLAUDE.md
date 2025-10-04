@@ -290,3 +290,4 @@ The `starlink_energy_joules_total` counter tracks total energy in joules (watt-s
 **Impact:** Initial implementation read the wrong samples, resulting in constant bandwidth values instead of actual varying throughput.
 
 **Fix:** Implemented proper circular buffer iteration from `(lastCurrent + 1) % 900` to `Current % 900`.
+- Avoid using go build. When you need to check that the code is valid and compiles, use your go test instead (it's auto approved)
