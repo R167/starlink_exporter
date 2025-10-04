@@ -12,21 +12,17 @@ COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 COPY proto/ ./proto/
 
-# Build binary
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o exporter ./cmd/exporter
+# Build static binary
+RUN CGO_ENABLED=0 go build -o exporter ./cmd/exporter
 
-# Runtime stage
-FROM alpine:latest
-
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /app
+# Runtime stage - scratch for minimal image
+FROM scratch
 
 # Copy binary from builder
-COPY --from=builder /build/exporter .
+COPY --from=builder /build/exporter /exporter
 
 # Expose metrics port
 EXPOSE 9999
 
 # Run exporter
-ENTRYPOINT ["/app/exporter"]
+ENTRYPOINT ["/exporter"]

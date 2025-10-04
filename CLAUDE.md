@@ -248,7 +248,7 @@ make clean         # Remove generated files (proto dir)
 ### Dockerfile
 Multi-stage build for minimal image size:
 1. **Build stage**: Go 1.25 alpine, builds static binary with CGO disabled
-2. **Runtime stage**: Alpine with ca-certificates only, ~10MB final image
+2. **Runtime stage**: Scratch (empty base), ~20MB final image
 
 ### GitHub Actions
 Automatic Docker builds on push to `master`:
