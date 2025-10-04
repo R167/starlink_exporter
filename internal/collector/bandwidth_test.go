@@ -114,10 +114,10 @@ func TestBandwidthTracker_CumulativeUpdates(t *testing.T) {
 		PopPingLatencyMs:      make([]float64, 900),
 		PopPingDropRate:       make([]float64, 900),
 	}
-	history2.DownlinkThroughputBps[100] = 8000  // 1000 bytes/sec
-	history2.DownlinkThroughputBps[101] = 8000  // 1000 bytes/sec
-	history2.UplinkThroughputBps[100] = 0       // 0 bytes/sec
-	history2.UplinkThroughputBps[101] = 8000    // 1000 bytes/sec
+	history2.DownlinkThroughputBps[100] = 8000 // 1000 bytes/sec
+	history2.DownlinkThroughputBps[101] = 8000 // 1000 bytes/sec
+	history2.UplinkThroughputBps[100] = 0      // 0 bytes/sec
+	history2.UplinkThroughputBps[101] = 8000   // 1000 bytes/sec
 
 	tracker.processHistory(history2)
 
