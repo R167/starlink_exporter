@@ -158,7 +158,7 @@ func (bt *BandwidthTracker) processHistory(history *client.HistoryResponse) {
 	var sampleIndices []int
 
 	for i := uint64(0); i < timeDelta; i++ {
-		t := bt.lastCurrent + 1 + i
+		t := bt.lastCurrent + i
 		idx := int(t % bufferLen)
 
 		// Bandwidth: convert bits/sec to bytes (each sample = 1 second)

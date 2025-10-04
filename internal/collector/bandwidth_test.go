@@ -55,7 +55,8 @@ func TestBandwidthTracker_SecondUpdate(t *testing.T) {
 	tracker.processHistory(history1)
 
 	// Second update at timestamp 1003 (3 seconds later)
-	// Circular buffer: new samples at indices 1001%900=101, 1002%900=102, 1003%900=103
+	// Circular buffer: new samples at indices 1000%900=100, 1001%900=101, 1002%900=102
+	// Index 1003%900=103 is the NEXT sample to be written (not yet valid)
 	history2 := &client.HistoryResponse{
 		Current:               1003,
 		DownlinkThroughputBps: make([]float64, 900),
@@ -65,12 +66,12 @@ func TestBandwidthTracker_SecondUpdate(t *testing.T) {
 		PopPingDropRate:       make([]float64, 900),
 	}
 	// Set values at circular buffer indices
-	history2.DownlinkThroughputBps[101] = 8000  // 1000 bytes/sec
-	history2.DownlinkThroughputBps[102] = 16000 // 2000 bytes/sec
-	history2.DownlinkThroughputBps[103] = 24000 // 3000 bytes/sec
-	history2.UplinkThroughputBps[101] = 4000    // 500 bytes/sec
-	history2.UplinkThroughputBps[102] = 8000    // 1000 bytes/sec
-	history2.UplinkThroughputBps[103] = 12000   // 1500 bytes/sec
+	history2.DownlinkThroughputBps[100] = 8000  // 1000 bytes/sec
+	history2.DownlinkThroughputBps[101] = 16000 // 2000 bytes/sec
+	history2.DownlinkThroughputBps[102] = 24000 // 3000 bytes/sec
+	history2.UplinkThroughputBps[100] = 4000    // 500 bytes/sec
+	history2.UplinkThroughputBps[101] = 8000    // 1000 bytes/sec
+	history2.UplinkThroughputBps[102] = 12000   // 1500 bytes/sec
 
 	tracker.processHistory(history2)
 
@@ -104,7 +105,7 @@ func TestBandwidthTracker_CumulativeUpdates(t *testing.T) {
 	tracker.processHistory(history1)
 
 	// Second update: 2 seconds later
-	// Circular indices: 1001%900=101, 1002%900=102
+	// Circular indices: 1000%900=100, 1001%900=101
 	history2 := &client.HistoryResponse{
 		Current:               1002,
 		DownlinkThroughputBps: make([]float64, 900),
@@ -113,17 +114,17 @@ func TestBandwidthTracker_CumulativeUpdates(t *testing.T) {
 		PopPingLatencyMs:      make([]float64, 900),
 		PopPingDropRate:       make([]float64, 900),
 	}
-	history2.DownlinkThroughputBps[101] = 16000 // 2000 bytes/sec
-	history2.DownlinkThroughputBps[102] = 24000 // 3000 bytes/sec
+	history2.DownlinkThroughputBps[100] = 8000  // 1000 bytes/sec
+	history2.DownlinkThroughputBps[101] = 8000  // 1000 bytes/sec
+	history2.UplinkThroughputBps[100] = 0       // 0 bytes/sec
 	history2.UplinkThroughputBps[101] = 8000    // 1000 bytes/sec
-	history2.UplinkThroughputBps[102] = 16000   // 2000 bytes/sec
 
 	tracker.processHistory(history2)
 
 	downloadAfterFirst, uploadAfterFirst := tracker.GetCounters()
 
 	// Third update: 1 second later
-	// Circular index: 1003%900=103
+	// Circular index: 1002%900=102
 	history3 := &client.HistoryResponse{
 		Current:               1003,
 		DownlinkThroughputBps: make([]float64, 900),
@@ -132,13 +133,13 @@ func TestBandwidthTracker_CumulativeUpdates(t *testing.T) {
 		PopPingLatencyMs:      make([]float64, 900),
 		PopPingDropRate:       make([]float64, 900),
 	}
-	history3.DownlinkThroughputBps[103] = 32000 // 4000 bytes/sec
-	history3.UplinkThroughputBps[103] = 24000   // 3000 bytes/sec
+	history3.DownlinkThroughputBps[102] = 16000 // 2000 bytes/sec
+	history3.UplinkThroughputBps[102] = 24000   // 3000 bytes/sec
 
 	tracker.processHistory(history3)
 
 	// Should accumulate
-	expectedDownload := downloadAfterFirst + 4000.0
+	expectedDownload := downloadAfterFirst + 2000.0
 	download, upload := tracker.GetCounters()
 	if download != expectedDownload {
 		t.Errorf("Expected cumulative download %f, got %f", expectedDownload, download)
