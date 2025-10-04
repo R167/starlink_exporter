@@ -13,7 +13,7 @@ COPY internal/ ./internal/
 COPY proto/ ./proto/
 
 # Build static binary
-RUN CGO_ENABLED=0 go build -o exporter ./cmd/exporter
+RUN go build -o exporter ./cmd/exporter
 
 # Runtime stage - scratch for minimal image
 FROM scratch
