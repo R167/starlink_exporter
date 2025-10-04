@@ -4,7 +4,7 @@
 !*.pb.go
 
 # Binaries
-exporter
+/exporter
 
 # Test coverage
 *.out
