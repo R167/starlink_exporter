@@ -143,6 +143,22 @@ proto/spacex_api/             # Generated protobuf files
 ```
 
 ## Running the Exporter
+
+### Using Docker (Recommended)
+```bash
+# Default configuration
+docker run -p 9999:9999 ghcr.io/r167/starlink_exporter:master
+
+# Custom configuration
+docker run -p 8080:8080 ghcr.io/r167/starlink_exporter:master \
+  --listen :8080 --dish 192.168.100.1:9200 --log-level debug
+
+# Build locally
+docker build -t starlink_exporter .
+docker run -p 9999:9999 starlink_exporter
+```
+
+### Using Go
 ```bash
 # Default configuration
 go run ./cmd/exporter
@@ -226,6 +242,19 @@ make run           # Run the exporter
 make dev           # Rebuild protos and run
 make clean         # Remove generated files (proto dir)
 ```
+
+## Docker & CI/CD
+
+### Dockerfile
+Multi-stage build for minimal image size:
+1. **Build stage**: Go 1.25 alpine, builds static binary with CGO disabled
+2. **Runtime stage**: Alpine with ca-certificates only, ~10MB final image
+
+### GitHub Actions
+Automatic Docker builds on push to `master`:
+- Builds for `linux/amd64`, `linux/arm64`, `linux/arm/v7`
+- Publishes to GitHub Container Registry: `ghcr.io/r167/starlink_exporter:master`
+- Uses Docker Buildx for multi-platform builds
 
 ## Available Tools
 - `grpcurl` - gRPC client with reflection support

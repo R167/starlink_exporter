@@ -14,6 +14,22 @@ A Prometheus exporter for Starlink Dishy metrics written in Go. Exports bandwidt
 
 ## Quick Start
 
+### Using Docker (Recommended)
+
+```bash
+# Run with defaults (listens on :9999, connects to 192.168.100.1:9200)
+docker run -p 9999:9999 ghcr.io/r167/starlink_exporter:master
+
+# Custom configuration
+docker run -p 8080:8080 ghcr.io/r167/starlink_exporter:master \
+  --listen :8080 --dish 192.168.100.1:9200 --log-level debug
+
+# View metrics
+curl -s localhost:9999/metrics | grep starlink_
+```
+
+### Using Go
+
 ```bash
 # Run with defaults (listens on :9999, connects to 192.168.100.1:9200)
 go run ./cmd/exporter
@@ -158,6 +174,10 @@ make test       # Run tests
 make run        # Run the exporter
 make dev        # Rebuild protos and run
 make clean      # Remove generated files
+
+# Build Docker image locally
+docker build -t starlink_exporter .
+docker run -p 9999:9999 starlink_exporter
 ```
 
 ### Debug Output
